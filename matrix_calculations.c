@@ -1,6 +1,7 @@
 #include "useful.h"
 #include "math.h"
 #include "stdlib.h"
+#include "matrix_calculations.h"
 
 double **createWeightedAdjacencyMatrix(int n, int d, double** data_points) {
     double **matrix = allocate_memory_array_of_points(n, n);
@@ -79,10 +80,52 @@ double **subtractIbyMatrix(int n, double ** matrix) {
     return result;
 }
 
+double **getUnitMatrix(int n) {
+    double **result = allocate_memory_array_of_points(n, n);
+    int i, j;
+    for (i=0; i < n; i++) {
+        result[i][j] = 1;
+    }
+    return result;
+}
+
 double **createNormalizedGraphLaplacian(int n, double** diagonalDegreeMatrix, double ** weightedAdjacencyMatrix) {
     double ** d = getDiagonalMatrixPoweredByMinusHalf(n, diagonalDegreeMatrix);
     double ** tmp = multiply3Matrices(n, d, weightedAdjacencyMatrix, d);
     double ** result = subtractIbyMatrix(n, tmp);
     free(tmp);
     return result;
+}
+
+double **transposeMatrix(int n, double **matrix) {
+    double **result = allocate_memory_array_of_points(n, n);
+    int i, j;
+    for (i=0; i < n; i++) {
+        for (j=0; j < n; j++) {
+                result[i][j] = matrix[j][i];
+        }
+    }
+    return result;
+}
+
+//return matrix P^tAP
+double **multipleFromBothSides(int n, double** matrixA, double ** matrixP) {
+    double **matrixPTransposed = transposeMatrix(n, matrixP);
+    double **result = multiply3Matrices(n, matrixPTransposed, matrixA, matrixP);
+    free(matrixPTransposed);
+    return result;
+}
+
+int *getIndicesOfLargestAbsoluteValue(int n, double **matrix) {
+    int indices[] = {0,0};
+    int i, j;
+    for (i=0; i < n; i++) {
+        for (j=0; j < n; j++) {
+            if (fabs(matrix[indices[0]][indices[1]]) <= fabs(matrix[i][j])) {
+                indices[0] = i;
+                indices[1] = j;
+            }
+        }
+    }
+    return indices;
 }

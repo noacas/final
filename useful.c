@@ -35,3 +35,10 @@ double** allocate_memory_array_of_points(int d, int array_size) {
     assert(p != NULL);
     return a;
 }
+
+int sign(double num) {
+    if (num >= 0) {
+        return 1;
+    }
+    return 0;
+}
